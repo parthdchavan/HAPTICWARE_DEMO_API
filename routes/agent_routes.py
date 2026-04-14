@@ -4,7 +4,7 @@ from auth.auth_handler import verify_token
 from database import SessionLocal
 from models import Agent
 from schemas import AgentCreate, StatusUpdate
-from services.llm_service import generate_summary
+from services.llm_service import generate_summary, generate_api_info
 
 router = APIRouter()
 
@@ -25,10 +25,13 @@ def create_agent(
     db: Session = Depends(get_db),
     _: str = Depends(verify_token),
 ):
+    summary = generate_summary(agent.status)
+
     new_agent = Agent(
         name=agent.name,
         type=agent.type,
         status=agent.status,
+        summary=summary,
     )
 
     db.add(new_agent)      # add to DB
@@ -40,7 +43,7 @@ def create_agent(
         "name": new_agent.name,
         "type": new_agent.type,
         "status": new_agent.status,
-        "summary": generate_summary(new_agent.status),
+        "summary": new_agent.summary,
     }
 
 
@@ -53,17 +56,24 @@ def get_agents(
     agents = db.query(Agent).all()
 
     result = []
+    changed = False
     for agent in agents:
-        summary = generate_summary(agent.status)
+        if not agent.summary:
+            agent.summary = generate_summary(agent.status)
+            changed = True
+
         result.append(
             {
                 "id": agent.id,
                 "name": agent.name,
                 "type": agent.type,
                 "status": agent.status,
-                "summary": summary,
+                "summary": agent.summary,
             }
         )
+
+    if changed:
+        db.commit()
 
     return result
 
@@ -81,6 +91,7 @@ def update_status(
         raise HTTPException(status_code=404, detail="Agent not found")
 
     agent.status = update.status
+    agent.summary = generate_summary(update.status)
 
     db.commit()
     db.refresh(agent)
@@ -90,5 +101,21 @@ def update_status(
         "name": agent.name,
         "type": agent.type,
         "status": agent.status,
-        "summary": generate_summary(agent.status),
+        "summary": agent.summary,
+    }
+
+
+@router.get("/ai/api-info")
+def get_api_information(_: str = Depends(verify_token)):
+    try:
+        info = generate_api_info()
+    except Exception as e:
+        raise HTTPException(
+            status_code=503,
+            detail=f"AI service unavailable: {str(e)}",
+        )
+
+    return {
+        "topic": "What is API and how it works",
+        "answer": info,
     }
