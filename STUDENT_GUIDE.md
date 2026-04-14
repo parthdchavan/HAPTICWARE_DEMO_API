@@ -93,7 +93,7 @@ We handled issues like:
 - Import errors: happened when config values were not defined
 
 Why this matters:
-- Shows debugging skill and API understanding.
+- Shows debugging skill and API understand.
 
 ---
 
