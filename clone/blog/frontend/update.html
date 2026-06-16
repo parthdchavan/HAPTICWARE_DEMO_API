@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Post</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0f0f13; color: #e2e8f0; min-height: 100vh; }
+
+        header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(15,15,19,0.85); backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 18px 48px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo { font-size: 1.3rem; font-weight: 800; background: linear-gradient(135deg, #a78bfa, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .back-btn {
+            color: #94a3b8; text-decoration: none; font-size: 0.88rem; font-weight: 500;
+            padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.2s;
+        }
+        .back-btn:hover { color: #e2e8f0; border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
+
+        .wrapper { max-width: 680px; margin: 40px auto; padding: 0 24px 80px; }
+        .page-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 28px; color: #f1f5f9; }
+
+        .card {
+            background: #16161d; border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 18px; padding: 36px;
+        }
+
+        .field { margin-bottom: 22px; }
+        label {
+            display: block; font-size: 0.75rem; font-weight: 700;
+            color: #64748b; margin-bottom: 8px;
+            text-transform: uppercase; letter-spacing: 0.08em;
+        }
+        input, select, textarea {
+            width: 100%; padding: 12px 16px;
+            background: #0f0f13; border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 10px; font-size: 0.93rem; font-family: 'Inter', sans-serif;
+            color: #e2e8f0; outline: none; transition: border-color 0.2s;
+        }
+        input:focus, select:focus, textarea:focus { border-color: #6d28d9; }
+        select option { background: #16161d; }
+        textarea { height: 180px; resize: vertical; line-height: 1.7; }
+
+        .existing-label { font-size: 0.78rem; color: #475569; margin-bottom: 8px; }
+        .existing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; margin-bottom: 12px; }
+        .existing-grid img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); }
+
+        .upload-box {
+            border: 2px dashed rgba(139,92,246,0.3); border-radius: 12px;
+            padding: 24px; text-align: center;
+            background: rgba(139,92,246,0.05); cursor: pointer; transition: all 0.2s;
+        }
+        .upload-box:hover { border-color: rgba(139,92,246,0.6); background: rgba(139,92,246,0.1); }
+        .upload-box input { display: none; }
+        .upload-box p { color: #a78bfa; font-size: 0.88rem; font-weight: 500; margin-top: 6px; }
+        .upload-box small { color: #475569; font-size: 0.78rem; margin-top: 4px; display: block; }
+
+        .preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; margin-top: 12px; }
+        .preview-grid img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 8px; border: 1px solid rgba(16,185,129,0.3); }
+
+        .btn-submit {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white; border: none; border-radius: 10px;
+            font-size: 0.95rem; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 16px rgba(16,185,129,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(16,185,129,0.4); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">✦ BlogSpace</div>
+    <a href="/blog/{{ blog.id }}" class="back-btn">← Back to Post</a>
+</header>
+
+<div class="wrapper">
+    <h1 class="page-title">✏️ Edit Post</h1>
+    <div class="card">
+        <form action="/update/{{ blog.id }}" method="post" enctype="multipart/form-data">
+
+            <div class="field">
+                <label>Title</label>
+                <input type="text" name="title" value="{{ blog.title }}" required>
+            </div>
+
+            <div class="field">
+                <label>Author</label>
+                <input type="text" name="author" value="{{ blog.author }}" required>
+            </div>
+
+            <div class="field">
+                <label>Category</label>
+                <select name="category" required>
+                    {% for cat in ["Technology", "Science", "Education", "Health", "Sports", "Other"] %}
+                    <option value="{{ cat }}" {% if blog.category == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Photos</label>
+                {% set img_list = blog.image_list() %}
+                {% if img_list %}
+                <p class="existing-label">Current photos ({{ img_list|length }}) — new uploads will be added</p>
+                <div class="existing-grid">
+                    {% for img in img_list %}
+                    <img src="/uploads/{{ img }}" alt="">
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div class="upload-box" onclick="document.getElementById('imgInput').click()">
+                    <div style="font-size:28px;">🖼️</div>
+                    <p>Click to add more photos</p>
+                    <small>Select multiple images at once</small>
+                    <input type="file" id="imgInput" name="images" accept="image/*" multiple onchange="previewImages(event)">
+                </div>
+                <div class="preview-grid" id="previewGrid"></div>
+            </div>
+
+            <div class="field">
+                <label>Content</label>
+                <textarea name="content" required>{{ blog.content }}</textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">💾 Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function previewImages(e) {
+        const grid = document.getElementById('previewGrid');
+        grid.innerHTML = '';
+        for (const file of e.target.files) {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            grid.appendChild(img);
+        }
+    }
+</script>
+</body>
+</html>

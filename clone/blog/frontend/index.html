@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0f0f13; color: #e2e8f0; min-height: 100vh; }
+
+        /* ── HEADER ── */
+        header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(15,15,19,0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 18px 48px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo { font-size: 1.3rem; font-weight: 800; background: linear-gradient(135deg, #a78bfa, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .btn-new {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white; padding: 10px 24px; border-radius: 10px;
+            text-decoration: none; font-weight: 600; font-size: 0.88rem;
+            box-shadow: 0 4px 14px rgba(79,70,229,0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-new:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(79,70,229,0.5); }
+
+        /* ── HERO ── */
+        .hero {
+            text-align: center; padding: 72px 24px 48px;
+            background: radial-gradient(ellipse at top, rgba(79,70,229,0.15) 0%, transparent 70%);
+        }
+        .hero h2 { font-size: 2.8rem; font-weight: 800; line-height: 1.2; background: linear-gradient(135deg, #fff 30%, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { color: #64748b; font-size: 1rem; margin-top: 12px; }
+
+        /* ── GRID ── */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 24px; max-width: 1200px;
+            margin: 0 auto 60px; padding: 0 24px;
+        }
+
+        /* ── CARD ── */
+        .card {
+            background: #16161d;
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 18px; overflow: hidden;
+            transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+        }
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-color: rgba(139,92,246,0.35);
+        }
+
+        .img-gallery { display: flex; height: 200px; overflow: hidden; gap: 2px; }
+        .img-gallery img { flex: 1; object-fit: cover; min-width: 0; transition: transform 0.4s; }
+        .card:hover .img-gallery img { transform: scale(1.04); }
+        .no-img {
+            width: 100%; height: 200px;
+            background: linear-gradient(135deg, #1e1b4b, #312e81);
+            display: flex; align-items: center; justify-content: center; font-size: 52px;
+        }
+
+        .card-body { padding: 20px; }
+        .meta { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+        .badge {
+            background: rgba(139,92,246,0.15); color: #a78bfa;
+            padding: 4px 12px; border-radius: 20px;
+            font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+            border: 1px solid rgba(139,92,246,0.25);
+        }
+        .img-count {
+            background: rgba(255,255,255,0.05); color: #64748b;
+            padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 500;
+        }
+        .card-title { font-size: 1.15rem; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; line-height: 1.4; }
+        .card-author { font-size: 0.8rem; color: #64748b; margin-bottom: 10px; }
+        .card-content {
+            font-size: 0.87rem; color: #94a3b8; line-height: 1.7;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        .card-actions { display: flex; gap: 8px; margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); }
+        .btn-read {
+            flex: 2; padding: 9px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white; border-radius: 9px; font-size: 0.85rem; font-weight: 600;
+            text-align: center; text-decoration: none;
+            box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+            transition: opacity 0.2s;
+        }
+        .btn-read:hover { opacity: 0.88; }
+        .btn-edit, .btn-delete {
+            flex: 1; padding: 9px; border: none; border-radius: 9px;
+            font-size: 0.85rem; font-weight: 600;
+            text-align: center; text-decoration: none; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-edit   { background: rgba(14,165,233,0.12); color: #38bdf8; }
+        .btn-delete { background: rgba(239,68,68,0.12);  color: #f87171; }
+        .btn-edit:hover   { background: rgba(14,165,233,0.22); }
+        .btn-delete:hover { background: rgba(239,68,68,0.22); }
+
+        .empty { grid-column: 1/-1; text-align: center; padding: 90px 0; color: #334155; }
+        .empty span { font-size: 64px; display: block; margin-bottom: 16px; }
+        .empty p { font-size: 1rem; }
+        .empty a { color: #818cf8; text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">✦ BlogSpace</div>
+    <a href="/create" class="btn-new">+ New Post</a>
+</header>
+
+<div class="hero">
+    <h2>Explore the Latest Posts</h2>
+    <p>Read, write, and share ideas with the world</p>
+</div>
+
+<div class="grid">
+    {% for blog in blogs %}
+    {% set img_list = blog.image_list() %}
+    <div class="card">
+        {% if img_list %}
+        <div class="img-gallery">
+            {% for img in img_list[:3] %}<img src="/uploads/{{ img }}" alt="">{% endfor %}
+        </div>
+        {% else %}
+        <div class="no-img">📝</div>
+        {% endif %}
+
+        <div class="card-body">
+            <div class="meta">
+                <span class="badge">{{ blog.category }}</span>
+                {% if img_list %}<span class="img-count">🖼 {{ img_list|length }}</span>{% endif %}
+            </div>
+            <div class="card-title">{{ blog.title }}</div>
+            <div class="card-author">✍️ {{ blog.author }}</div>
+            <div class="card-content">{{ blog.content }}</div>
+            <div class="card-actions">
+                <a href="/blog/{{ blog.id }}" class="btn-read">📖 Read</a>
+                <a href="/update/{{ blog.id }}" class="btn-edit">✏️</a>
+                <a href="/delete/{{ blog.id }}" class="btn-delete" onclick="return confirm('Delete this blog?');">🗑️</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty">
+        <span>📭</span>
+        <p>No posts yet. <a href="/create">Write the first one!</a></p>
+    </div>
+    {% endfor %}
+</div>
+
+</body>
+</html>
